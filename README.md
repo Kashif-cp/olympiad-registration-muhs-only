@@ -1,0 +1,1 @@
+# olympiad-registration-muhs-only
