@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Olympiad Registration Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
+        body { background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; overflow-x: hidden; }
+        .container { background: rgba(255, 255, 255, 0.95); max-width: 550px; width: 100%; padding: 40px 35px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); position: relative; margin-bottom: 20px; }
+        h2 { text-align: center; color: #1a202c; font-weight: 700; margin-bottom: 8px; font-size: 26px; letter-spacing: -0.5px; }
+        .subtitle { text-align: center; color: #718096; font-size: 14px; margin-bottom: 30px; }
+        .progress-container { display: flex; justify-content: space-between; margin-bottom: 35px; position: relative; }
+        .progress-container::before { content: ''; background: #e2e8f0; height: 4px; width: 100%; position: absolute; top: 50%; transform: translateY(-50%); left: 0; z-index: 1; }
+        .progress-bar { position: absolute; top: 50%; transform: translateY(-50%); left: 0; height: 4px; background: #4f46e5; width: 0%; z-index: 2; transition: width 0.4s ease; }
+        .step-indicator { width: 36px; height: 36px; background: #fff; border: 3px solid #e2e8f0; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 700; color: #a0aec0; z-index: 3; transition: all 0.3s ease; font-size: 14px; }
+        .step-indicator.active { border-color: #4f46e5; color: #4f46e5; background: #fff; box-shadow: 0 0 12px rgba(79, 70, 229, 0.25); }
+        .step-indicator.completed { background: #4f46e5; border-color: #4f46e5; color: #fff; }
+        .form-step { display: none; opacity: 0; transform: translateX(20px); transition: all 0.4s ease; }
+        .form-step.active { display: block; opacity: 1; transform: translateX(0); }
+        .input-group { margin-bottom: 22px; position: relative; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #344054; font-size: 14px; }
+        .input-group input, .input-group select { width: 100%; padding: 12px 16px; border: 1px solid #d0d5dd; border-radius: 10px; font-size: 15px; color: #1d2939; outline: none; background: #fcfcfc; transition: all 0.2s ease; }
+        .input-group input:focus, .input-group select:focus { border-color: #84caff; background: #fff; box-shadow: 0 0 0 4px #e4f2fe; }
+        .gender-container { display: flex; gap: 12px; margin-top: 4px; }
+        .gender-option { flex: 1; border: 1px solid #d0d5dd; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; background: #fcfcfc; font-size: 14px; font-weight: 500; color: #344054; transition: all 0.2s; position: relative; }
+        .gender-option input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .gender-option.selected { border-color: #4f46e5; background: #f5f3ff; color: #4f46e5; font-weight: 600; box-shadow: 0 0 0 3px #e4f2fe; }
+        .subject-option { display: flex; align-items: center; margin-bottom: 12px; background: #f8fafc; padding: 14px 18px; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.25s ease; }
+        .subject-option:hover { background: #f1f5f9; border-color: #cbd5e1; }
+        .subject-option input { margin-right: 15px; width: 18px; height: 18px; accent-color: #4f46e5; cursor: pointer; }
+        .subject-option label { font-size: 15px; font-weight: 500; color: #334155; cursor: pointer; user-select: none; width: 100%; }
+        .subject-option.checked-active { background: #f5f3ff; border-color: #c084fc; }
+        .payment-box { text-align: left; padding: 20px; background: #fff; border-radius: 14px; margin-bottom: 15px; cursor: pointer; border: 2px solid #e2e8f0; display: block; transition: all 0.3s; position: relative; }
+        .payment-box input { position: absolute; top: 22px; right: 20px; width: 18px; height: 18px; accent-color: #4f46e5; }
+        .payment-box strong { font-size: 16px; color: #1e293b; display: block; margin-bottom: 4px; }
+        .payment-box p { font-size: 13px; color: #64748b; line-height: 1.4; }
+        .payment-box.selected { border-color: #4f46e5; background: #f8fafc; }
+        .price-tag { margin: 25px 0; padding: 15px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 12px; font-size: 18px; color: #991b1b; font-weight: 700; text-align: center; border: 1px dashed #fca5a5; }
+        .btn-container { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px; }
+        button { padding: 12px 24px; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 600; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; }
+        .btn-next, .btn-submit { background: #4f46e5; color: white; flex-grow: 1; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25); }
+        .btn-next:hover, .btn-submit:hover { background: #4338ca; }
+        .btn-prev { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+        .alert { padding: 16px 20px; border-radius: 12px; margin-bottom: 25px; font-weight: 600; text-align: center; font-size: 14px; display: none; }
+        .alert-success { background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; display: block; }
+        .alert-error { background-color: #fff1f2; color: #991b1b; border: 1px solid #fecdd3; display: block; }
+        .dev-footer { text-align: center; font-size: 13px; color: #475569; margin-top: 10px; font-weight: 500; letter-spacing: 0.3px; }
+        .dev-footer span { color: #4f46e5; font-weight: 700; }
+    </style>
+    <meta name="google-site-verification" content="qNllx7pnJ0lWmVSE1_2YueFOZ6I3S95fjBDeoPCGrxw" />
+</head>
+<body>
+
+<div class="container">
+    <h2>Olympiad Registration </h2>
+    <p class="subtitle">Complete your registration process</p>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="step-indicator active" id="ind-1">1</div>
+        <div class="step-indicator" id="ind-2">2</div>
+        <div class="step-indicator" id="ind-3">3</div>
+    </div>
+
+    <div id="statusAlert" class="alert"></div>
+
+    <form id="olympiadForm" method="POST" action="process.php">
+        <!-- STEP 1 -->
+        <div class="form-step active" id="step-1">
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" name="full_name" required placeholder="Enter your full name">
+            </div>
+            <div class="input-group">
+                <label>Gender</label>
+                <div class="gender-container">
+                    <label class="gender-option" onclick="selectGender(this)">
+                        <input type="radio" name="gender" value="Male" required> Male
+                    </label>
+                    <label class="gender-option" onclick="selectGender(this)">
+                        <input type="radio" name="gender" value="Female"> Female
+                    </label>
+                    <label class="gender-option" onclick="selectGender(this)">
+                        <input type="radio" name="gender" value="Other"> Other
+                    </label>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Mobile Number</label>
+                <input type="tel" name="mobile_number" pattern="[0-9]{10}" required placeholder="Enter 10-digit mobile number">
+            </div>
+            <div class="input-group">
+                <label>Class</label>
+                <select name="class_name" id="class_name" required>
+                    <option value="">Choose your class</option>
+                    <option value="Class 8">Class 8</option>
+                    <option value="Class 9">Class 9</option>
+                    <option value="Class 10">Class 10</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Gmail Address</label>
+                <input type="email" name="email" required placeholder="username@gmail.com">
+            </div>
+            <div class="btn-container">
+                <div></div>
+                <button type="button" class="btn-next" onclick="nextStep(2)">Next Step &rarr;</button>
+            </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="form-step" id="step-2">
+            <h3 style="margin-bottom:18px; color:#1e293b; font-size:17px; font-weight:600;">Choose Olympiad Subjects</h3>
+            <div class="subject-option" onclick="toggleRowCheckbox(this)">
+                <input type="checkbox" name="subjects[]" value="IEO" class="subject-checkbox" onchange="calculateTotal(event)">
+                <label>International English Olympiad (IEO)</label>
+            </div>
+            <div class="subject-option" onclick="toggleRowCheckbox(this)">
+                <input type="checkbox" name="subjects[]" value="IMO" class="subject-checkbox" onchange="calculateTotal(event)">
+                <label>International Mathematics Olympiad (IMO)</label>
+            </div>
+            <div class="subject-option" onclick="toggleRowCheckbox(this)">
+                <input type="checkbox" name="subjects[]" value="NSO" class="subject-checkbox" onchange="calculateTotal(event)">
+                <label>National Science Olympiad (NSO)</label>
+            </div>
+            <div class="subject-option" onclick="toggleRowCheckbox(this)">
+                <input type="checkbox" name="subjects[]" value="ICO" class="subject-checkbox" onchange="calculateTotal(event)">
+                <label>National General Kmowledge Olympiad(IGKO)</label>
+            </div>
+            <div class="subject-option" onclick="toggleRowCheckbox(this)">
+                <input type="checkbox" name="subjects[]" value="ICO" class="subject-checkbox" onchange="calculateTotal(event)">
+                <label>National Social Studies Olympiad(ISSO)</label>
+                
+            </div>
+             <div class="subject-option" onclick="toggleRowCheckbox(this)">
+                <input type="checkbox" name="subjects[]" value="ICO" class="subject-checkbox" onchange="calculateTotal(event)">
+                <label>National Hindi Olympiad(IHO)</label>
+                
+            </div>
+             <div class="subject-option" onclick="toggleRowCheckbox(this)">
+                <input type="checkbox" name="subjects[]" value="ICO" class="subject-checkbox" onchange="calculateTotal(event)">
+                <label>National Computer Science Olympiad(ICSO)</label>
+                
+            </div>
+            <div class="price-tag">
+                Calculated Fees: ₹<span id="fee-display">0</span>/-
+                <div style="font-size: 12px; font-weight: 500; opacity: 0.8; margin-top: 3px;">(Standard Rate: ₹200 per subject)</div>
+            </div>
+            <div class="btn-container">
+                <button type="button" class="btn-prev" onclick="prevStep(1)">&larr; Back</button>
+                <button type="button" class="btn-next" onclick="validateStep2()">Next Step &rarr;</button>
+            </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="form-step" id="step-3">
+            <h3 style="margin-bottom:18px; color:#1e293b; font-size:17px; font-weight:600; text-align:center;">Select Gateway Verification Mode</h3>
+            <label class="payment-box" id="pay-online-box" onclick="selectPayment('Online Payment')">
+                <input type="radio" name="payment_method" value="Online Payment" id="radio-online" required>
+                <strong>Pay Online Securely</strong>
+                <p>Verify registration via digital gateway tracking</p>
+            </label>
+            <label class="payment-box" id="pay-teacher-box" onclick="selectPayment('Cash to Teacher')">
+                <input type="radio" name="payment_method" value="Cash to Teacher" id="radio-teacher">
+                <strong>Pay Tomorrow to Sajid Iqbal Sir</strong>
+                <p>Hand over physical cash counter-desk at school tomorrow morning</p>
+            </label>
+            <div class="btn-container">
+                <button type="button" class="btn-prev" onclick="prevStep(2)">&larr; Back</button>
+                <button type="submit" class="btn-submit">Confirm & Submit &check;</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="dev-footer">This site created by <span>Developer Kashif Ahmad Khan</span></div>
+<div class="dev-footer"><footer>© 2026 Kashif Ahmad Khan, Muslim Urdu High School. All Rights Reserved.</footer></div>
+
+<script>
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.has('status') && urlParams.has('msg')) {
+            const alertBox = document.getElementById('statusAlert');
+            alertBox.innerText = decodeURIComponent(urlParams.get('msg'));
+            alertBox.className = 'alert alert-' + urlParams.get('status');
+        }
+    }
+    function selectGender(element) {
+        document.querySelectorAll('.gender-option').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        element.querySelector('input').checked = true;
+    }
+    function toggleRowCheckbox(rowElement) {
+        const checkbox = rowElement.querySelector('.subject-checkbox');
+        if (event.target !== checkbox) { checkbox.checked = !checkbox.checked; checkbox.dispatchEvent(new Event('change')); }
+        if(checkbox.checked) { rowElement.classList.add('checked-active'); } else { rowElement.classList.remove('checked-active'); }
+    }
+    function updateProgressBar(step) {
+        const bar = document.getElementById('progressBar');
+        const indicators = document.querySelectorAll('.step-indicator');
+        let widthPct = step === 2 ? '50%' : (step === 3 ? '100%' : '0%');
+        bar.style.width = widthPct;
+        indicators.forEach((ind, idx) => {
+            const currentIndNum = idx + 1;
+            if(currentIndNum < step) { ind.className = 'step-indicator completed'; ind.innerHTML = '&check;'; }
+            else if(currentIndNum === step) { ind.className = 'step-indicator active'; ind.innerText = currentIndNum; }
+            else { ind.className = 'step-indicator'; ind.innerText = currentIndNum; }
+        });
+    }
+    function nextStep(step) {
+        if(step === 2) {
+            const fields = document.getElementById('step-1').querySelectorAll('input, select');
+            for(let field of fields) { if(!field.checkValidity()) { field.reportValidity(); return; } }
+            if(!document.querySelector('input[name="gender"]:checked')) { alert('Please pick your Gender type to proceed.'); return; }
+        }
+        document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+        document.getElementById('step-' + step).classList.add('active');
+        updateProgressBar(step);
+    }
+    function prevStep(step) {
+        document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+        document.getElementById('step-' + step).classList.add('active');
+        updateProgressBar(step);
+    }
+    function calculateTotal(e) { if(e) e.stopPropagation(); const checkedCount = document.querySelectorAll('.subject-checkbox:checked').length; document.getElementById('fee-display').innerText = checkedCount * 200; }
+    function validateStep2() { if(document.querySelectorAll('.subject-checkbox:checked').length === 0) { alert('Please pick at least one subject to proceed further.'); } else { nextStep(3); } }
+    function selectPayment(method) {
+        document.querySelectorAll('.payment-box').forEach(el => el.classList.remove('selected'));
+        if(method === 'Online Payment') { document.getElementById('radio-online').checked = true; document.getElementById('pay-online-box').classList.add('selected'); }
+        else { document.getElementById('radio-teacher').checked = true; document.getElementById('pay-teacher-box').classList.add('selected'); }
+    }
+</script>
+</body>
+</html>
